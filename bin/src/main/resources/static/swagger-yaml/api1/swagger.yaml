@@ -1,0 +1,414 @@
+---
+openapi: 3.0.0
+info:
+  title: HR management tool
+  description: The API allows to manage companies, candidates and job vacancies
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Companies
+  description: Manage the registered companies
+- name: Candidates
+  description: Mange the Candidates
+- name: Vacancies
+  description: Manage job vacancies
+paths:
+  /companies:
+    get:
+      tags:
+      - Companies
+      summary: Retrives the list of all companies
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Companies'
+    post:
+      tags:
+      - Companies
+      summary: Add a new company
+      requestBody:
+        $ref: '#/components/requestBodies/Companies'
+      responses:
+        "405":
+          description: Invalid Input
+        "200":
+          description: Successfully Created
+  /companies/{companyID}:
+    delete:
+      tags:
+      - Companies
+      summary: Deletes a company
+      parameters:
+      - name: companyID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+  /candidates:
+    get:
+      tags:
+      - Candidates
+      summary: Retrives the list of all candidates
+      parameters:
+      - name: max
+        in: query
+        description: maximum number of candidates
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int64
+          example: 5
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidates'
+    post:
+      tags:
+      - Candidates
+      summary: Add a new candidate
+      requestBody:
+        $ref: '#/components/requestBodies/Candidates'
+      responses:
+        "405":
+          description: Invalid Input
+        "200":
+          description: Successfully Created
+  /candidates/findByStatus:
+    get:
+      tags:
+      - Candidates
+      summary: Retrives the candidates by status
+      parameters:
+      - name: byStatus
+        in: query
+        description: returns the candidates by status
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: interviewed
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidates'
+  /candidates/{candidateID}:
+    get:
+      tags:
+      - Candidates
+      summary: Retrives a candidate by candidate ID
+      parameters:
+      - name: candidateID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidate'
+    put:
+      tags:
+      - Candidates
+      summary: Updates the candidate details
+      parameters:
+      - name: candidateID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Enter the candidate details that need to be changed
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidate'
+      responses:
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Candidate not found
+    delete:
+      tags:
+      - Candidates
+      summary: Deletes a candidate
+      parameters:
+      - name: candidateID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: candidate not found
+  /vacancies:
+    get:
+      tags:
+      - Vacancies
+      summary: Retrives the list of all vacancy position
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vacancies'
+    post:
+      tags:
+      - Vacancies
+      summary: Add a new vacancy position
+      requestBody:
+        $ref: '#/components/requestBodies/Vacancies'
+      responses:
+        "405":
+          description: Invalid Input
+        "200":
+          description: Successfully Created
+  /vacancies/{vacancyID}:
+    put:
+      tags:
+      - Vacancies
+      summary: Updates the job vacancy details
+      parameters:
+      - name: vacancyID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Enter the job vacancy details that need to be changed
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vacancy'
+      responses:
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: vacancy position not found
+    delete:
+      tags:
+      - Vacancies
+      summary: Deletes the vacancy position
+      parameters:
+      - name: vacancyID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: vacancy position not found
+components:
+  schemas:
+    Companies:
+      type: array
+      description: List of all Companies
+      items:
+        $ref: '#/components/schemas/Company'
+    Company:
+      required:
+      - companyName
+      - isAdmin
+      - location
+      - password
+      - revenue
+      - username
+      - website
+      type: object
+      properties:
+        companyID:
+          type: integer
+          format: int64
+          example: 21
+        username:
+          type: string
+          example: sdtech
+        password:
+          type: string
+          format: password
+        companyName:
+          type: string
+          example: SDtech
+        companySize:
+          type: integer
+          default: 0
+        revenue:
+          type: integer
+          format: int64
+          example: 122000
+        website:
+          type: string
+          example: www.sdtech.io
+        isAdmin:
+          type: boolean
+          example: true
+    Candidates:
+      type: array
+      description: List of all employees
+      items:
+        $ref: '#/components/schemas/Candidate'
+    Candidate:
+      required:
+      - aadhar_num
+      - contact_num
+      - date
+      - email
+      - name
+      - status
+      type: object
+      properties:
+        candidateID:
+          type: integer
+          format: int64
+          example: 12
+        companyID:
+          type: integer
+          format: int64
+          example: 2
+        name:
+          type: string
+          example: ryan
+        contact_num:
+          type: string
+          example: "9898989898"
+        email:
+          type: string
+          example: ryan@gmail.com
+        aadhar_num:
+          type: string
+          example: "987612346789"
+        status:
+          type: string
+          description: status of the candidate
+          enum:
+          - interviewed
+          - offer_rolled
+          - offer_accepted
+          - absconded
+    Vacancies:
+      type: array
+      description: List of all job vacancies
+      items:
+        $ref: '#/components/schemas/Vacancy'
+    Vacancy:
+      required:
+      - job_title
+      - openings
+      type: object
+      properties:
+        vacancyID:
+          type: integer
+          format: int64
+          example: 7
+        companyID:
+          type: integer
+          format: int64
+          example: 2
+        job_title:
+          type: string
+          example: Manager
+        level:
+          type: string
+          description: job role level
+          default: mid
+          enum:
+          - junior
+          - mid
+          - senior
+        openings:
+          type: integer
+          example: 5
+  parameters:
+    Company:
+      name: companyID
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    Vacancy:
+      name: vacancyID
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    Candidates:
+      name: candidateID
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  requestBodies:
+    Companies:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Companies'
+      required: true
+    Candidates:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Candidates'
+      required: true
+    Vacancies:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Vacancies'
+      required: true
